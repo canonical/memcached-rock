@@ -1,0 +1,12 @@
+summary: Test memcached 1.6-26.04 responds to memcached-tool via sidecar
+
+execute: |
+  # Cleanup on exit
+  trap "docker stop memcached-rock >/dev/null 2>&1 || true" EXIT
+
+  #run the container in a non default port
+  docker run --rm -d --name memcached-rock -p 22122:22122 memcached:1.6-26.04 \
+    --args memcached --port=22122 --udp-port=11211
+
+  printf "set my_key 0 60 11\r\nhello world\r\n" | nc -q 1 127.0.0.1 22122
+  printf "get my_key\r\n" | nc -q 1 127.0.0.1 22122 | grep "hello world"

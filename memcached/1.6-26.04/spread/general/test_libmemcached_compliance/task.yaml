@@ -1,0 +1,31 @@
+summary: Test libmemcached compliance (memcping, memccat, memcflush, memcslap)
+
+execute: |
+  #Cleanup on exit
+  trap "docker stop memcached-rock memcached-client >/dev/null 2>&1 || true" EXIT
+
+  # Create docker network for communication between containers
+  docker network create test-network >/dev/null 2>&1 || true
+
+  # Start the memcached container. Passes argument to the entrypoint to listen on all addresses
+  docker run --rm -d --name memcached-rock \
+    --network test-network memcached:1.6-26.04 --args memcached --listen=0.0.0.0
+
+  # Spin up a client container to test connectivity
+  docker run --rm -d --name memcached-client --network test-network ubuntu:26.04 sleep infinity
+  docker exec memcached-client bash -c "apt -qy update && apt -qy install libmemcached-tools"
+
+  #Test differnet commands from libmemcached-tools to verify compliance with the memcached protocol
+  docker exec memcached-client bash -c "memcping --servers=memcached-rock"
+  docker exec memcached-client bash -c "memccat --servers=memcached-rock ''"
+    if [ $? -ne 0 ]; then
+      # Before libmemcached 1.1.0 the  memccat CLI would not crash in case a
+      # key was not provided, but would crash if an empty key was passed. This
+      # behavior was changed to crashing when not providing a key and not
+      # crashing when an empty key is provided since 1.1.0. Therefore, we test
+      # both cases to ensure this test is compliant to all supported
+      # libmemcached versions.
+      docker exec memcached-client bash -c "memccat --servers=memcached-rock"
+    fi
+  docker exec memcached-client bash -c "memcflush --servers=memcached-rock"
+  docker exec memcached-client bash -c "memcslap --servers=memcached-rock"

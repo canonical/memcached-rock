@@ -1,0 +1,22 @@
+summary: Test network connectivity between two containers
+
+execute: |
+  #Cleanup on exit
+  trap "docker stop memcached-rock memcached-client >/dev/null 2>&1 || true" EXIT
+
+  # Create docker network for communication between containers
+  docker network create test-network >/dev/null 2>&1 || true
+
+  # Start the memcached container. Passes argument to the entrypoint to listen on all addresses
+  docker run --rm -d --name memcached-rock \
+    --network test-network memcached:1.6-26.04 --args memcached --listen=0.0.0.0
+
+  # Spin up a client container to test connectivity
+  docker run --rm -d --name memcached-client --network test-network ubuntu:26.04 sleep infinity
+  docker exec memcached-client bash -c "apt -qy update && apt -qy install netcat-openbsd"
+
+  #Send a command from memcached-client to memcached-rock to set a key inside memcached
+  docker exec memcached-client bash -c "printf 'set my_key 0 60 11\r\nhello world\r\n' | nc -q 1 memcached-rock 11211"
+
+  #Send a command from memcached-client to memcached-rock to get the key and verify the value  
+  docker exec memcached-client bash -c "printf 'get my_key\r\n' | nc -q 1 memcached-rock 11211" | grep 'hello world'
