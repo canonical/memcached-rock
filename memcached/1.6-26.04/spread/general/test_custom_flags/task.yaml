@@ -1,4 +1,4 @@
-summary: Test memcached 1.6-26.04 responds to memcached-tool via sidecar
+summary: Test memcached responds to memcached-tool via sidecar
 
 execute: |
   # Cleanup on exit

@@ -1,4 +1,4 @@
-summary: Test memcached 1.6-26.04 responds to memcached-tool via sidecar
+summary: Test memcaches listens on port 11211
 
 execute: |
   # Cleanup on exit
