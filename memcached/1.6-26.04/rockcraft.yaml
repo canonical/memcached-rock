@@ -1,16 +1,17 @@
 name: memcached
-# see https://documentation.ubuntu.com/rockcraft/en/1.14.0/explanation/bases/
-# for more information about bases and using 'bare' bases for chiselled rocks
-base: bare # the base environment for this rock
-build-base: devel
-version: '1.6' # just for humans. Semantic versioning is recommended
-summary: Single-line elevator pitch for your amazing rock # 79 char long summary
+version: '1.6' 
+summary: Single-line elevator pitch for your amazing rock
 description: |
     This is my-rock-name's description. You have a paragraph or two to tell the
     most important story about it. Keep it under 100 words though,
     we live in tweetspace and your description wants to look good in the
     container registries out there.
-platforms: # the platforms this rock should be built on and run on
+
+base: bare
+build-base: devel
+run-user: _daemon_
+
+platforms:
     amd64:
 
 services:
@@ -19,18 +20,14 @@ services:
     summary: "memcached service"
     command: memcached -u _daemon_
     startup: enabled
-    environment:
-      TZ: UTC
-
-run-user: _daemon_
 
 parts:
     memcached:
         plugin: nil
         stage-packages:
             - base-files_base 
-            - base-files_chisel #creates manifest for chisel with all slices
-            - base-files_release-info #ect os releases info
+            - base-files_chisel
+            - base-files_release-info
             - libsasl2-modules_libs
             - memcached_bins
             - tzdata_zoneinfo
