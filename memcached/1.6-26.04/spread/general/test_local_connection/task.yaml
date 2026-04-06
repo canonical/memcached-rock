@@ -4,8 +4,14 @@ execute: |
   # Cleanup on exit
   trap "docker stop memcached-rock >/dev/null 2>&1 || true" EXIT
 
-  #run the container and bind the port
+  # Run the container and bind the port
   docker run --rm -d --name memcached-rock -p 11211:11211 memcached:1.6-26.04 
 
+  # Wait for memcached to be available on the new port
+  until printf "stats\r\n" | nc -q 1 -w 1 127.0.0.1 11211 | grep "STAT uptime"; do
+    echo "Waiting for memcached to be available on port 11211..."
+  done
+
+  # Write and read a value to verify memcached is working
   printf "set my_key 0 60 11\r\nhello world\r\n" | nc -q 1 127.0.0.1 11211
   printf "get my_key\r\n" | nc -q 1 127.0.0.1 11211 | grep "hello world"

@@ -1,19 +1,21 @@
 name: memcached
-# see https://documentation.ubuntu.com/rockcraft/en/1.14.0/explanation/bases/
-# for more information about bases and using 'bare' bases for chiselled rocks
-base: bare # the base environment for this rock
-build-base: devel
-version: '1.6' # just for humans. Semantic versioning is recommended
-summary: High-performance, distributed memory object caching system
+version: '1.6' 
+summary: Single-line elevator pitch for your amazing rock
 description: |
-    Memcached is a distributed memory cache designed to speed up web
-    applications by caching database and API results. It is intended for use
-    in accelerating dynamic web applications by reducing database load.
-    By storing frequently accessed data in RAM, it minimizes latency and
-    enables infrastructure to scale efficiently during peak traffic.
+    This is my-rock-name's description. You have a paragraph or two to tell the
+    most important story about it. Keep it under 100 words though,
+    we live in tweetspace and your description wants to look good in the
+    container registries out there.
 
-platforms: # the platforms this rock should be built on and run on
+base: bare
+build-base: devel
+run-user: _daemon_
+
+platforms:
     amd64:
+    arm64:
+    ppc64el:
+    s390x:
 
 services:
   memcached:
@@ -21,18 +23,14 @@ services:
     summary: "memcached service"
     command: memcached -u _daemon_
     startup: enabled
-    environment:
-      TZ: UTC
-
-run-user: _daemon_
 
 parts:
     memcached:
         plugin: nil
         stage-packages:
             - base-files_base 
-            - base-files_chisel #creates manifest for chisel with all slices
-            - base-files_release-info #ect os releases info
+            - base-files_chisel
+            - base-files_release-info
             - libsasl2-modules_libs
             - memcached_bins
             - tzdata_zoneinfo
