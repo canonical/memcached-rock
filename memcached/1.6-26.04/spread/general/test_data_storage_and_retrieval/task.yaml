@@ -15,6 +15,6 @@ execute: |
   docker run --rm -d --name memcached-client --network test-network ubuntu:26.04 sleep infinity
   docker exec memcached-client bash -c "apt -qy update && apt -qy install libmemcached-tools"
 
-  #Test differnet commands from libmemcached-tools to verify compliance with the memcached protocol
+  # Test different commands from libmemcached-tools to verify compliance with the memcached protocol
   docker exec memcached-client bash -c "echo 'Hello World' > /tmp/test_data && memccp --servers=memcached-rock /tmp/test_data"
   docker exec memcached-client bash -c "memccat --servers=memcached-rock test_data" | grep 'Hello World'
