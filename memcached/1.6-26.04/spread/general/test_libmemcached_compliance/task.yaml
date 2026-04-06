@@ -17,8 +17,8 @@ execute: |
 
   #Test differnet commands from libmemcached-tools to verify compliance with the memcached protocol
   docker exec memcached-client bash -c "memcping --servers=memcached-rock"
-  docker exec memcached-client bash -c "memccat --servers=memcached-rock ''"
-    if [ $? -ne 0 ]; then
+  docker exec memcached-client bash -c "memccat --servers=memcached-rock ''" || rc=$?
+    if [ "${rc:-0}" -ne 0 ]; then
       # Before libmemcached 1.1.0 the  memccat CLI would not crash in case a
       # key was not provided, but would crash if an empty key was passed. This
       # behavior was changed to crashing when not providing a key and not
