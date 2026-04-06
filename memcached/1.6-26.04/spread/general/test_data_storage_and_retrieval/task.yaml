@@ -1,8 +1,12 @@
 summary: Verify memcached can store and retrieve data via libmemcached-tools
 
 execute: |
-  #Cleanup on exit
-  trap "docker stop memcached-rock memcached-client >/dev/null 2>&1 || true" EXIT
+  # Cleanup on exit
+  cleanup() {
+    docker stop memcached-rock memcached-client >/dev/null 2>&1 || true
+    docker network rm test-network >/dev/null 2>&1 || true
+  }
+  trap cleanup EXIT
 
   # Create docker network for communication between containers
   docker network create test-network >/dev/null 2>&1 || true
