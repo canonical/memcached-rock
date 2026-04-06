@@ -1,11 +1,12 @@
 name: memcached
 version: '1.6' 
-summary: Single-line elevator pitch for your amazing rock
+summary: High-performance, distributed memory object caching system
 description: |
-    This is my-rock-name's description. You have a paragraph or two to tell the
-    most important story about it. Keep it under 100 words though,
-    we live in tweetspace and your description wants to look good in the
-    container registries out there.
+    Memcached is a distributed memory cache designed to speed up web
+    applications by caching database and API results. It is intended for use
+    in accelerating dynamic web applications by reducing database load.
+    By storing frequently accessed data in RAM, it minimizes latency and
+    enables infrastructure to scale efficiently during peak traffic.
 
 base: bare
 build-base: devel
