@@ -1,0 +1,44 @@
+name: memcached
+version: '1.6' 
+summary: High-performance, distributed memory object caching system
+description: |
+    Memcached is a distributed memory cache designed to speed up web
+    applications by caching database and API results. It is intended for use
+    in accelerating dynamic web applications by reducing database load.
+    By storing frequently accessed data in RAM, it minimizes latency and
+    enables infrastructure to scale efficiently during peak traffic.
+
+base: bare
+build-base: devel
+run-user: _daemon_
+
+platforms:
+    amd64:
+    arm64:
+    ppc64el:
+    s390x:
+
+services:
+  memcached:
+    override: replace
+    summary: "memcached service"
+    command: memcached -u _daemon_
+    startup: enabled
+
+parts:
+    memcached:
+        plugin: nil
+        stage-packages:
+            - base-files_base 
+            - base-files_chisel
+            - base-files_release-info
+            - libsasl2-modules_libs
+            - memcached_bins
+            - tzdata_zoneinfo
+
+    deb-security-manifest:
+        plugin: make
+        source: https://github.com/canonical/rocks-security-manifest
+        source-type: git
+        source-branch: main
+        override-prime: gen_manifest
