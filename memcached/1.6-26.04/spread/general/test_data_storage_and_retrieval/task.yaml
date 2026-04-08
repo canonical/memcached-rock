@@ -1,0 +1,24 @@
+summary: Verify memcached can store and retrieve data via libmemcached-tools
+
+execute: |
+  # Cleanup on exit
+  cleanup() {
+    docker stop memcached-rock memcached-client >/dev/null 2>&1 || true
+    docker network rm test-network >/dev/null 2>&1 || true
+  }
+  trap cleanup EXIT
+
+  # Create docker network for communication between containers
+  docker network create test-network >/dev/null 2>&1 || true
+
+  # Start the memcached container. Passes argument to the entrypoint to listen on all addresses
+  docker run --rm -d --name memcached-rock \
+    --network test-network memcached:1.6-26.04 --args memcached --listen=0.0.0.0
+
+  # Spin up a client container to test connectivity
+  docker run --rm -d --name memcached-client --network test-network ubuntu:26.04 sleep infinity
+  docker exec memcached-client bash -c "apt -qy update && apt -qy install libmemcached-tools"
+
+  # Test different commands from libmemcached-tools to verify compliance with the memcached protocol
+  docker exec memcached-client bash -c "echo 'Hello World' > /tmp/test_data && memccp --servers=memcached-rock /tmp/test_data"
+  docker exec memcached-client bash -c "memccat --servers=memcached-rock test_data" | grep 'Hello World'
