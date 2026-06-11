@@ -1,0 +1,49 @@
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: memcached-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: memcached
+  template:
+    metadata:
+      labels:
+        app: memcached
+    spec:
+      containers:
+      - name: memcached
+        image: localhost:32000/memcached:1.6-26.04
+        env:
+        - name: MEMCACHED_CACHE_SIZE
+          value: "128"
+        - name: MEMCACHED_MAX_CONNECTIONS
+          value: "2048"
+        - name: MEMCACHED_THREADS
+          value: "8"
+        - name: MEMCACHED_USERNAME
+          value: "john"
+        - name: MEMCACHED_PASSWORD
+          value: "pAs$wd"
+        ports:
+        - containerPort: 11211
+          name: memcached
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: memcached-service
+spec:
+  type: NodePort
+  selector:
+    app: memcached
+  ports:
+  - protocol: TCP
+    port: 11211
+    targetPort: 11211
+    nodePort: 31211
+    name: memcached
