@@ -32,6 +32,7 @@ suites:
     summary: K8s integration tests
 
     prepare: |
+      sudo snap remove docker
       sudo snap install rockcraft --classic
 
       # on s390x and ppc64le we need to install k8s from the edge channel
@@ -41,12 +42,6 @@ suites:
       fi
       snap info k8s
       sudo snap install k8s --classic --channel=$CHANNEL
-
-      # Stop any docker daemons to avoid conflicts with k8s on containerd
-      sudo systemctl stop docker || true
-      sudo systemctl stop docker.socket || true
-      sudo systemctl disable docker.socket || true
-      sudo systemctl disable docker || true
 
       # Cleanup containerd
       sudo rm -rf /run/containerd
