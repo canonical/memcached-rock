@@ -49,7 +49,35 @@ suites:
 
       # Bootstrap k8s and wait for it to be ready
       k8s bootstrap
-      k8s status --wait-ready
+      
+      # Wait for readiness, but collect diagnostics if it fails
+      if ! timeout 600 k8s status --wait-ready; then
+          echo "===== DEBUG INFO ====="
+
+          uname -a || true
+
+          echo "===== k8s status ====="
+          k8s status || true
+
+          echo "===== services ====="
+          sudo systemctl --no-pager --full status snap.k8s.daemon-k8sd || true
+
+          echo "===== k8sd logs ====="
+          sudo journalctl -u snap.k8s.daemon-k8sd \
+            --no-pager -n 500 || true
+
+          echo "===== cluster pods ====="
+          k8s kubectl get pods -A -o wide || true
+
+          echo "===== cluster events ====="
+          k8s kubectl get events -A \
+            --sort-by=.metadata.creationTimestamp || true
+
+          echo "===== nodes ====="
+          k8s kubectl get nodes -o wide || true
+
+          exit 1
+      fi
 
       # Copy the built image to the local registry
       /snap/k8s/current/bin/ctr --address /run/containerd/containerd.sock -n k8s.io \
