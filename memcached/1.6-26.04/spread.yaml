@@ -47,21 +47,7 @@ suites:
       sudo rm -rf /var/run/containerd
 
       # Bootstrap k8s and wait for it to be ready
-      k8s bootstrap || {
-          echo "=== k8sd logs ==="
-          journalctl -u k8sd --no-pager -n 500 || true
-
-          echo "=== k8sd service status ==="
-          systemctl status k8sd || true
-
-          echo "=== kubectl pods ==="
-          kubectl get pods -A || true
-
-          echo "=== cluster status ==="
-          k8s status || true
-
-          exit 1
-      }
+      k8s bootstrap
       k8s status --wait-ready
 
       # Copy the built image to the local registry
