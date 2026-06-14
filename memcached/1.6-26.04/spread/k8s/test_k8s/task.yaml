@@ -2,6 +2,15 @@ summary: Test memcaches listens on port 31211
 
 execute: |
 
+  # Cilium (CNI) is not yet supported on s390x and ppc64le
+  # so we'll skip the k8s tests on those architectures for now
+  # ---
+  # TODO: Remove this check once Cilium supports s390x and ppc64le
+  if [ "$(uname -m)" = "s390x" ] || [ "$(uname -m)" = "ppc64le" ]; then
+    echo "Skipping k8s tests on $(uname -m) architecture"
+    exit 0
+  fi
+
   # Run the container and bind the port
   k8s kubectl apply -f deployment.yaml
   k8s kubectl rollout status deploy/memcached-deployment --timeout=120s
