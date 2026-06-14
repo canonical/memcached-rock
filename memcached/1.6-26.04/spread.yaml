@@ -41,6 +41,10 @@ suites:
       fi
       sudo snap install k8s --classic --channel=$CHANNEL
 
+      # Stop any running containerd or docker daemons to avoid conflicts with k8s
+      sudo systemctl stop containerd || true
+      sudo systemctl stop docker || true
+
       # Bootstrap k8s and wait for it to be ready
       k8s bootstrap
       k8s status --wait-ready
