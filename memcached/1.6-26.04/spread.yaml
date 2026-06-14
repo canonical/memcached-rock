@@ -38,9 +38,8 @@ suites:
       # on s390x and ppc64le we need to install k8s from the edge channel
       CHANNEL="stable"
       if [ "$(uname -m)" = "s390x" ] || [ "$(uname -m)" = "ppc64le" ]; then
-        CHANNEL="edge"
+        CHANNEL="latest/edge"
       fi
-      snap info k8s
       sudo snap install k8s --classic --channel=$CHANNEL
 
       # Cleanup containerd
