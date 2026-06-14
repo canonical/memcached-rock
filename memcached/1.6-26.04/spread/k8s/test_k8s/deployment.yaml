@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: memcached
-        image: localhost:32000/memcached:1.6-26.04
+        image: memcached:1.6
         env:
         - name: MEMCACHED_CACHE_SIZE
           value: "128"

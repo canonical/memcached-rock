@@ -3,7 +3,8 @@ summary: Test memcaches listens on port 31211
 execute: |
 
   # Run the container and bind the port
-  microk8s kubectl apply -f deployment.yaml
+  k8s kubectl apply -f deployment.yaml
+  k8s kubectl rollout status deploy/memcached-deployment --timeout=120s
 
   # Wait for memcached to be available on the new port
   until printf "stats\r\n" | nc -q 1 -w 1 127.0.0.1 31211 | grep "STAT uptime"; do
