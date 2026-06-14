@@ -39,6 +39,7 @@ suites:
       if [ "$(uname -m)" = "s390x" ] || [ "$(uname -m)" = "ppc64le" ]; then
         CHANNEL="edge"
       fi
+      snap info k8s
       sudo snap install k8s --classic --channel=$CHANNEL
 
       # Stop any docker daemons to avoid conflicts with k8s on containerd
