@@ -2,7 +2,7 @@ summary: Test memcached responds to memcached-tool via sidecar
 
 execute: |
   # Cleanup on exit
-  trap "docker stop memcached-rock >/dev/null 2>&1 || true" EXIT
+  trap "docker rm -f memcached-rock >/dev/null 2>&1 || true" EXIT
 
   # Run the container in a non default port
   docker run --rm -d --name memcached-rock -p 22122:22122 memcached:1.6-26.04 \
