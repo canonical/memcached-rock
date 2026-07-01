@@ -27,8 +27,4 @@ execute: |
   # Launch memcached bound to an internal address
   k8s kubectl apply -f probe.yaml
   k8s kubectl rollout status deploy/memcached-probe --timeout=60s
-  
-  k8s kubectl logs deploy/memcached-probe 2>/dev/null || true
-  exit 99 # debug
-
   ! k8s kubectl logs deploy/memcached-probe 2>/dev/null | grep -q 'stopped unexpectedly'
