@@ -1,0 +1,51 @@
+# Test-only dns-race probe (kept out of deployment.yaml so that stays a clean
+# example). memcached only touches dns at startup, when it resolves its --listen
+# address, so we tell it to bind a Service *name*. mid-convergence coredns returns
+# EPERM, memcached can't resolve its listen addr and exits -> pebble crash-loops
+# the service (visible in the pod log; see task.yaml). once dns settles it binds.
+#
+# NOTE: the headless Service sets publishNotReadyAddresses so the name resolves to
+# this pod's own IP even before it's Ready -- otherwise it could never bind to
+# become Ready (it's not in the endpoints until Ready, not Ready until bound).
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: memcached-probe-headless
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  selector:
+    app: memcached-probe
+  ports:
+  - protocol: TCP
+    port: 11211
+    targetPort: 11211
+    name: memcached
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: memcached-probe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: memcached-probe
+  template:
+    metadata:
+      labels:
+        app: memcached-probe
+    spec:
+      containers:
+      - name: memcached
+        image: memcached:1.6
+        # bind the headless name -> forces a coredns lookup at startup.
+        args:
+        - "--args"
+        - "memcached"
+        - "--listen=memcached-probe-headless.default.svc.cluster.local"
+        ports:
+        - containerPort: 11211
+          name: memcached
+          protocol: TCP
