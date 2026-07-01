@@ -24,16 +24,15 @@ execute: |
   printf "set my_key 0 60 11\r\nhello world\r\n" | nc -q 1 127.0.0.1 31211
   printf "get my_key\r\n" | nc -q 1 127.0.0.1 31211 | grep "hello world"
 
-  # DNS-race probe (see probe.yaml): memcached is told to bind a headless Service
-  # name, forcing a coredns lookup at startup.
-  # wait for the pod (pebble is pid 1) to be Running so we can read its service log,
-  # then give memcached a few resolve attempts.
+  # memcached binds on startup. in pobe is told to bind a headless service name,
+  # forcing a coredns lookup. we first wait for the pod to be Running so we can
+  # read its service log.
   k8s kubectl apply -f probe.yaml
   until k8s kubectl get pod -l app=memcached-probe \
     -o jsonpath='{.items[0].status.phase}' 2>/dev/null | grep -q Running; do
     sleep 2
   done
-  sleep 5
+  sleep 5 # give memcached a few attempts to resolve its bind address
 
   # the pod's own not-yet-published headless address gives benign
   # "Name or service not known" in memcached logs. coredns-unreachable gives
