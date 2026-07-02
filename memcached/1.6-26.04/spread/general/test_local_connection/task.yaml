@@ -2,7 +2,7 @@ summary: Test memcaches listens on port 11211
 
 execute: |
   # Cleanup on exit
-  trap "docker stop memcached-rock >/dev/null 2>&1 || true" EXIT
+  trap "docker rm -f memcached-rock >/dev/null 2>&1 || true" EXIT
 
   # Run the container and bind the port
   docker run --rm -d --name memcached-rock -p 11211:11211 memcached:1.6-26.04 
