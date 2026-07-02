@@ -1,0 +1,49 @@
+# Test-only probe (kept out of deployment.yaml so that stays a clean example). 
+# memcached only touches dns at startup, when it resolves its --listen address,
+# so we tell it to bind a service *name*
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: memcached-probe-headless
+spec:
+  clusterIP: None
+  # publish name before we're ready such that the name resolves to this pods
+  # own IP even before its status is Ready. Otherwise we could never bind
+  # because we'd be in a chicken-an-egg problem with our own DNS resolution
+  # (no address until until Ready, but not Ready until bound).
+  publishNotReadyAddresses: true
+  selector:
+    app: memcached-probe
+  ports:
+  - protocol: TCP
+    port: 11211
+    targetPort: 11211
+    name: memcached
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: memcached-probe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: memcached-probe
+  template:
+    metadata:
+      labels:
+        app: memcached-probe
+    spec:
+      containers:
+      - name: memcached
+        image: memcached:1.6
+        # bind the headless name -> forces a coredns lookup at startup.
+        args:
+        - "--args"
+        - "memcached"
+        - "--listen=memcached-probe-headless.default.svc.cluster.local"
+        ports:
+        - containerPort: 11211
+          name: memcached
+          protocol: TCP
