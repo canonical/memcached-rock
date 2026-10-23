@@ -1,4 +1,4 @@
-project: memcached
+project: memcached:devel
 
 backends:
   craft:
@@ -23,10 +23,10 @@ suites:
       sudo apt remove --yes retry
 
       # Load the rock into docker
-      sudo rockcraft.skopeo --insecure-policy copy "oci-archive:$CRAFT_ARTIFACT" docker-daemon:memcached:1.6-26.04
+      sudo rockcraft.skopeo --insecure-policy copy "oci-archive:$CRAFT_ARTIFACT" docker-daemon:memcached:devel
 
     restore: |
-      docker image rm --force memcached:1.6-26.04
+      docker image rm --force memcached:devel
 
   spread/k8s/:
     summary: K8s integration tests

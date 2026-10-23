@@ -9,4 +9,4 @@ repository.
 
 ## Available versions
 
-* [memcached-1.6 (Ubuntu 26.04)](./memcached/1.6-26.04/rockcraft.yaml)
+* [memcached-1.6 (Ubuntu 26.04)](https://github.com/canonical/memcached-rock/tree/1.6-26.04)

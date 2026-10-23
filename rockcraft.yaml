@@ -9,7 +9,7 @@ description: |
     enables infrastructure to scale efficiently during peak traffic.
 
 base: bare
-build-base: ubuntu@26.04
+build-base: devel
 run-user: _daemon_
 
 platforms:

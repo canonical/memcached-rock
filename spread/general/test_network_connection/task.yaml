@@ -13,7 +13,7 @@ execute: |
 
   # Start the memcached container. Passes argument to the entrypoint to listen on all addresses
   docker run --rm -d --name memcached-rock \
-    --network test-network memcached:1.6-26.04 --args memcached --listen=0.0.0.0
+    --network test-network memcached:devel --args memcached --listen=0.0.0.0
 
   # Spin up a client container to test connectivity
   docker run --rm -d --name memcached-client --network test-network ubuntu:26.04 sleep infinity
