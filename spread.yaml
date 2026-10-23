@@ -1,4 +1,4 @@
-project: memcached
+project: memcached:1.6-26.04
 
 backends:
   craft:
