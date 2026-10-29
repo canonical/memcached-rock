@@ -9,7 +9,8 @@ description: |
     enables infrastructure to scale efficiently during peak traffic.
 
 base: bare
-build-base: ubuntu@26.10
+# TODO: Update once 26.10 is stabilized
+build-base: devel
 run-user: _daemon_
 
 platforms:
@@ -28,13 +29,26 @@ services:
 parts:
     memcached:
         plugin: nil
-        stage-packages:
-            - base-files_base 
-            - base-files_chisel
-            - base-files_release-info
-            - libsasl2-modules_libs
-            - memcached_bins
-            - tzdata_zoneinfo
+
+        # TODO: Uncomment once 26.10 is stabilized
+        # stage-packages:
+        #     - base-files_base 
+        #     - base-files_chisel
+        #     - base-files_release-info
+        #     - libsasl2-modules_libs
+        #     - memcached_bins
+        #     - tzdata_zoneinfo
+
+        # TODO: Remove once 26.10 is stabilized
+        override-build: |
+          craftctl default
+          chisel cut --release ubuntu-26.10 --root ${CRAFT_PART_INSTALL} \
+            base-files_base \
+            base-files_release-info \
+            libsasl2-modules_libs \
+            memcached_bins \
+            tzdata_zoneinfo
+
 
     deb-security-manifest:
         plugin: make
