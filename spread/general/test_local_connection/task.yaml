@@ -5,7 +5,7 @@ execute: |
   trap "docker rm -f memcached-rock >/dev/null 2>&1 || true" EXIT
 
   # Run the container and bind the port
-  docker run --rm -d --name memcached-rock -p 11211:11211 memcached:devel 
+  docker run --rm -d --name memcached-rock -p 11211:11211 memcached:1.6-26.10 
 
   # Wait for memcached to be available on the new port
   until printf "stats\r\n" | nc -q 1 -w 1 127.0.0.1 11211 | grep "STAT uptime"; do
